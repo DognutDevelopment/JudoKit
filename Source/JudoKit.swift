@@ -49,7 +49,13 @@ public class JudoKit {
     public var theme: Theme = Theme()
     
     /// currently active JudoPayViewController if available
-    public weak var activeViewController: JudoPayViewController?
+    public weak var activeViewController: JudoPayViewController? {
+        didSet {
+            self.didSetActiveViewController?()
+        }
+    }
+    
+    public var didSetActiveViewController: () -> Void?
     
     /// Fraud Prevention
     fileprivate let deviceDNA: DeviceDNA
