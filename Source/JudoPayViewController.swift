@@ -205,7 +205,7 @@ open class JudoPayViewController: UIViewController {
         super.viewWillAppear(animated)
         
         self.myView.paymentEnabled(false)
-        
+        self.edgesForExtendedLayout = []
         self.myView.layoutIfNeeded()
         
         if self.myView.cardDetails == nil && self.myView.cardInputField.textField.text != nil {
