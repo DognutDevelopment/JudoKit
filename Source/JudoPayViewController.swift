@@ -24,23 +24,23 @@
 
 import UIKit
 fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l < r
-  case (nil, _?):
-    return true
-  default:
-    return false
-  }
+    switch (lhs, rhs) {
+    case let (l?, r?):
+        return l < r
+    case (nil, _?):
+        return true
+    default:
+        return false
+    }
 }
 
 fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l > r
-  default:
-    return rhs < lhs
-  }
+    switch (lhs, rhs) {
+    case let (l?, r?):
+        return l > r
+    default:
+        return rhs < lhs
+    }
 }
 
 
@@ -67,7 +67,7 @@ open class JudoPayViewController: UIViewController {
     open fileprivate (set) var paymentToken: PaymentToken?
     /// Customer address to use when AVS is turned off
     open private(set) var address: Address?
-
+    
     /// The current transaction
     open let transaction: Transaction
     
@@ -89,7 +89,6 @@ open class JudoPayViewController: UIViewController {
             // Do nothing
         }
     }
-    
     
     /// The main JudoPayView of this ViewController
     var myView: JudoPayView!
@@ -154,8 +153,8 @@ open class JudoPayViewController: UIViewController {
     
     
     /**
-    viewDidLoad
-    */
+     viewDidLoad
+     */
     override open func viewDidLoad() {
         super.viewDidLoad()
         
@@ -171,16 +170,16 @@ open class JudoPayViewController: UIViewController {
         default:
             self.title = "Invalid"
         }
-
+        
         self.myView.threeDSecureWebView.delegate = self
         
         // Button actions
         let payButtonTitle = myView.transactionType == .registerCard ? judoKitSession.theme.registerCardNavBarButtonTitle : judoKitSession.theme.paymentButtonTitle
-
+        
         self.myView.paymentButton.addTarget(self, action: #selector(JudoPayViewController.payButtonAction(_:)), for: .touchUpInside)
         self.myView.paymentNavBarButton = UIBarButtonItem(title: payButtonTitle, style: .done, target: self, action: #selector(JudoPayViewController.payButtonAction(_:)))
         self.myView.paymentNavBarButton!.isEnabled = false
-
+        
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: self.judoKitSession.theme.backButtonTitle, style: .plain, target: self, action: #selector(JudoPayViewController.doneButtonAction(_:)))
         self.navigationItem.rightBarButtonItem = self.myView.paymentNavBarButton
         
@@ -229,16 +228,16 @@ open class JudoPayViewController: UIViewController {
             self.myView.cardInputField.textField.becomeFirstResponder()
         }
     }
-
+    
     
     // MARK: Button Actions
     
     
     /**
-    When the user hits the pay button, the information is collected from the fields and passed to the backend. The transaction will then be executed.
-    
-    - parameter sender: The payment button
-    */
+     When the user hits the pay button, the information is collected from the fields and passed to the backend. The transaction will then be executed.
+     
+     - parameter sender: The payment button
+     */
     @objc func payButtonAction(_ sender: AnyObject) {
         guard let reference = self.reference, let amount = self.amount, let judoId = self.judoId else {
             self.completionBlock?(nil, JudoError(.parameterError))
@@ -336,7 +335,7 @@ extension JudoPayViewController: UIWebViewDelegate {
     
     /**
      webView delegate method
-    
+     
      - parameter webView:        The web view
      - parameter request:        The request that was called
      - parameter navigationType: The navigation Type
@@ -390,8 +389,8 @@ extension JudoPayViewController: UIWebViewDelegate {
             
             UIView.animate(withDuration: 0.3, animations: { () -> Void in
                 self.myView.threeDSecureWebView.alpha = 0.0
-                }, completion: { (didFinish) -> Void in
-                    self.myView.threeDSecureWebView.loadRequest(URLRequest(url: URL(string: "about:blank")!))
+            }, completion: { (didFinish) -> Void in
+                self.myView.threeDSecureWebView.loadRequest(URLRequest(url: URL(string: "about:blank")!))
             })
             return false
         }
