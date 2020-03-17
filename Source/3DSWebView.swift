@@ -23,14 +23,14 @@
 //  SOFTWARE.
 
 import UIKit
-
+import WebKit
 
 /**
  
- The 3DSWebView is a UIWebView subclass that is configured to detect the execution of a 3DS validation page.
+ The 3DSWebView is a WKWebView subclass that is configured to detect the execution of a 3DS validation page.
  
  */
-open class _DSWebView: UIWebView {
+open class _DSWebView: WKWebView {
     
     // MARK: initialization
     
@@ -40,22 +40,10 @@ open class _DSWebView: UIWebView {
     - returns: a 3DSWebView object
     */
     public init() {
-        super.init(frame: CGRect.zero)
+        let configuration = WKWebViewConfiguration()
+        super.init(frame: .zero, configuration: configuration)
         self.setupView()
     }
-    
-    
-    /**
-     Convenience initializer
-     
-     - parameter frame: ignored
-     
-     - returns: a 3DSWebView object
-     */
-    convenience override init(frame: CGRect) {
-        self.init()
-    }
-    
     
     /**
      Convenience initializer
@@ -109,7 +97,7 @@ open class _DSWebView: UIWebView {
             request.setValue("\(postData.count)", forHTTPHeaderField: "Content-Length")
             request.httpBody = postData
             
-            self.loadRequest(request as URLRequest)
+            self.load(request as URLRequest)
         } else {
             throw JudoError(.failed3DSError)
         }

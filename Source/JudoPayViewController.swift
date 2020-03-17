@@ -23,6 +23,8 @@
 //  SOFTWARE.
 
 import UIKit
+import WebKit
+
 fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
     switch (lhs, rhs) {
     case let (l?, r?):
@@ -170,7 +172,7 @@ open class JudoPayViewController: UIViewController {
             self.title = "Invalid"
         }
         
-        self.myView.threeDSecureWebView.delegate = self
+        self.myView.threeDSecureWebView.navigationDelegate = self
         
         // Button actions
         let payButtonTitle = myView.transactionType == .registerCard ? judoKitSession.theme.registerCardNavBarButtonTitle : judoKitSession.theme.paymentButtonTitle
@@ -328,9 +330,9 @@ open class JudoPayViewController: UIViewController {
     
 }
 
-// MARK: UIWebViewDelegate
+// MARK: WKNavigationDelegate
 
-extension JudoPayViewController: UIWebViewDelegate {
+extension JudoPayViewController: WKNavigationDelegate {
     
     /**
      webView delegate method
@@ -341,14 +343,16 @@ extension JudoPayViewController: UIWebViewDelegate {
      
      - returns: return whether webView should start loading the request
      */
-    public func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebView.NavigationType) -> Bool {
-        let urlString = request.url?.absoluteString
+    
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        let urlString = navigationAction.request.url?.absoluteString
         
         if let urlString = urlString , urlString.range(of: "Parse3DS") != nil {
-            guard let body = request.httpBody,
+            guard let body = navigationAction.request.httpBody,
                 let bodyString = NSString(data: body, encoding: String.Encoding.utf8.rawValue) else {
                     self.completionBlock?(nil, JudoError(.failed3DSError))
-                    return false
+                    decisionHandler(.cancel)
+                    return
             }
             
             var results = JSONDictionary()
@@ -389,22 +393,24 @@ extension JudoPayViewController: UIWebViewDelegate {
             UIView.animate(withDuration: 0.3, animations: { () -> Void in
                 self.myView.threeDSecureWebView.alpha = 0.0
             }, completion: { (didFinish) -> Void in
-                self.myView.threeDSecureWebView.loadRequest(URLRequest(url: URL(string: "about:blank")!))
+                self.myView.threeDSecureWebView.load(URLRequest(url: URL(string: "about:blank")!))
             })
-            return false
+            decisionHandler(.cancel)
+            return
         }
-        return true
+        decisionHandler(.allow)
     }
-    
     
     /**
      webView delegate method that indicates the webView has finished loading
      
      - parameter webView: The web view
      */
-    public func webViewDidFinishLoad(_ webView: UIWebView) {
+
+    
+    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         var alphaVal: CGFloat = 1.0
-        if webView.request?.url?.absoluteString == "about:blank" {
+        if webView.url?.absoluteString == "about:blank" {
             alphaVal = 0.0
         }
         UIView.animate(withDuration: 0.5, animations: { () -> Void in
@@ -413,14 +419,13 @@ extension JudoPayViewController: UIWebViewDelegate {
         })
     }
     
-    
     /**
      webView delegate method that indicates the webView has failed with an error
      
      - parameter webView: The web view
      - parameter error:   The error
      */
-    public func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
+    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         UIView.animate(withDuration: 0.5, animations: { () -> Void in
             self.myView.threeDSecureWebView.alpha = 0.0
             self.myView.loadingView.stopAnimating()
@@ -428,5 +433,4 @@ extension JudoPayViewController: UIWebViewDelegate {
         
         self.completionBlock?(nil, JudoError(.failed3DSError, bridgedError: error as NSError?))
     }
-    
 }

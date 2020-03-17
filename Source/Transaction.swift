@@ -365,7 +365,7 @@ open class Transaction: SessionProtocol {
     /**
     threeDSecure call - this method will automatically trigger a Session Call to the judo REST API and execute the finalizing 3DS call on top of the information that had been sent in the previous methods
     
-    - Parameter dictionary: the dictionary that contains all the information from the 3DS UIWebView Request
+    - Parameter dictionary: the dictionary that contains all the information from the 3DS WKWebView Request
     - Parameter receiptId: the receipt for the given Transaction
     - Parameter block: a completion block that is called when the request finishes
     
