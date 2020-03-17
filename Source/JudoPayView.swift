@@ -181,6 +181,7 @@ open class JudoPayView: UIView {
             "securityMessage": securityMessageLabel,
             "tdsecure": threeDSecureWebView
         ]
+        let verticalTopSpace = 10
 
         addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "|[scrollView]|", metrics: nil, views: views))
 
